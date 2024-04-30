@@ -1,0 +1,50 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+        <ScoreFunction name="sfxn" weights="ref2015"/>
+    </SCOREFXNS>
+
+    <RESIDUE_SELECTORS>
+        <Chain name="chainA" chains="A"/>
+        <Chain name="chainB" chains="B"/>
+        <Index name="design_residues" resnums="123B-124B"/>
+	<InterfaceByVector name="interface" cb_dist_cut="8.0" vector_angle_cut="75" vector_dist_cut="9" grp1_selector="chainA" grp2_selector="chainB"/>
+        <True name="full_pose"/>
+	</RESIDUE_SELECTORS>
+
+    <TASKOPERATIONS>
+        <InitializeFromCommandline name="init"/>
+        <RestrictToRepacking name="repack_all"/>
+	<ReadResfile name="interface_resfile" filename="interface_resfile.txt" selector="design_residues"/>
+        <OperateOnResidueSubset name="restrict_to_repacking_interface" selector="design_residues">
+        <RestrictToRepackingRLT/>
+        </OperateOnResidueSubset>
+    </TASKOPERATIONS>
+
+    <MOVERS>
+        <FastDesign name="design_interface" repeats="1" scorefxn="sfxn" task_operations="interface_resfile">	
+        <MoveMap name="design_interface_mm">
+        <Span begin="1" end="999" bb="false" chi="false"/>
+        <Span begin="534" end="537" bb="false" chi="true"/>
+        <Jump number="1" setting="false"/>
+        </MoveMap>
+        </FastDesign>
+        <InterfaceAnalyzerMover name="analyze_interface" scorefxn="sfxn" pack_separated="1"/>
+    </MOVERS>
+
+    <FILTERS>
+        <Ddg name="ddg" threshold="-10.0" jump="1" repeats="5" repack="1"/>
+    </FILTERS>
+    <PROTOCOLS>
+        <Add mover_name="design_interface"/>
+	<Add mover_name="analyze_interface"/>
+        <Add filter_name="ddg"/>
+    </PROTOCOLS>
+    <OUTPUT scorefxn="sfxn"/>
+</ROSETTASCRIPTS>
+
+
+
+
+
+
+
